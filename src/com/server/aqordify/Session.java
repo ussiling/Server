@@ -31,7 +31,7 @@ public class Session implements Runnable {
 	private DataInputStream datainputstream = null;
 	private PrintStream printstream; 
 	private BufferedReader buffer;
-	private Object correctUser = false;
+	private User correctUser = null;
 
 
 	public final int PORT = 24000;
@@ -113,9 +113,12 @@ public class Session implements Runnable {
 						pass = userPass[2];
 						System.out.println("SESSION information" + " " + user + " " + pass); 	
 
-						//correctUser = (boolean) new DatabaseConnector().checkLogin(user, pass); 
-						//System.out.println("SESSION did u get it right? = " +correctUser); 	
-						//if(correctUser.equals("-1")){
+						
+						
+						//Returnar ett User objekt eller null
+						correctUser = new DatabaseConnector().checkLogin(user, pass); 
+						System.out.println("SESSION did u get it right? = " +correctUser); 	
+						if(correctUser!=null){
 
 						/**
 						 * Om användaren finns i databasen så returneras all info och jag lägger det i 
@@ -123,16 +126,20 @@ public class Session implements Runnable {
 						 * 
 						 */
 						//User u = new User("ussi", "Usman", "Sheikh", "Malmˆ", "SE", false);
-						//Server.userMap.put(user, u);
-						//printstream.println(SKICKA USERN);
-						//printstream.flush();
-						/**
-						 * Annars får jag -1 eller något annat vilket jag vet att user finns inte eller något är fel.
-						 */
-						//printstream.println("TESTAIGEN);
-						//printstream.flush();
-
+						Server.userMap.put(user, correctUser);
 						
+						printstream.println(correctUser.getFirstName() + correctUser.getLastName() + correctUser.getEmail() + correctUser.getPhone() + correctUser.getVoice() + correctUser.getAdmin() + correctUser.getMember());
+						printstream.flush();
+						
+						}else{
+							
+						/**
+						 * Annars får jag null eller något annat vilket jag vet att user finns inte eller något är fel.
+						 */
+						printstream.println(Protocol.ERROR);
+						printstream.flush();
+
+						}
 
 						//			    		  }
 					}
@@ -176,11 +183,11 @@ public class Session implements Runnable {
 				}
 				if(inputLine.startsWith("1")){
 					System.out.println("ONU");
-					send();
+					recieve();
 				}
 				if(inputLine.startsWith("2")){
 					System.out.println("DOS ");
-					recieve();
+					send();
 				}
 				else{
 					
@@ -230,13 +237,14 @@ public class Session implements Runnable {
  * Skicka bara det du får vidare till databasen
  * 
  * 
- * 
  */
+	
 	private void send() {
 		// TODO Auto-generated method stub
 		 // sendfile
 		try {
-        File myFile = new File ("C:\\Users\\Usman\\Desktop\\WorkSpaceWindow\\Aqordify\\src\\mario_bros.mp3");
+//      File myFile = new File ("C:\\Users\\Usman\\Desktop\\WorkSpaceWindow\\Aqordify\\src\\mario_bros.mp3");
+	    File myFile = new File ("/Aqordify/src/mario_bros.mp3");
 
         System.out.println("HOSSI + " + " ifexist " + myFile.exists()+ " " + myFile.length());
 
@@ -246,9 +254,7 @@ public class Session implements Runnable {
 
         BufferedInputStream bis = new BufferedInputStream(fis);
         bis.read(mybytearray,0,mybytearray.length);
-        OutputStream os;
-
-			os = client.getOutputStream();
+        OutputStream os = client.getOutputStream();
 	
         System.out.println("Sending...");
         os.write(mybytearray,0,mybytearray.length);
@@ -261,17 +267,14 @@ public class Session implements Runnable {
 		}
 	}
 	
-	
-	
-	
 	public void recieve(){
 		 ServerSocket serverSocket = null;
 
-		    try {
-		        serverSocket = new ServerSocket(24001);
-		    } catch (IOException ex) {
-		        System.out.println("Can't setup server on this port number. ");
-		    }
+//		    try {
+//		        serverSocket = new ServerSocket(24001);
+//		    } catch (IOException ex) {
+//		        System.out.println("Can't setup server on this port number. ");
+//		    }
 
 		    Socket socket = null;
 		    InputStream is = null;
@@ -295,7 +298,7 @@ public class Session implements Runnable {
 		    }
 
 		    try {
-		        fos = new FileOutputStream("C:\\Users\\Usman\\Desktop\\Test.mp3");
+		        fos = new FileOutputStream("Mac/Users/Ussi/Desktop/Server-master/Aqordify/src/test.mp3");
 		        bos = new BufferedOutputStream(fos);
 
 		    } catch (FileNotFoundException ex) {

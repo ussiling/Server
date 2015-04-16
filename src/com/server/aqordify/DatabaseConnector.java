@@ -117,7 +117,7 @@ public class DatabaseConnector {
 		ResultSet rsUser, rsPhone, rsEmail, rsAdmin, rsMember;
 		String queryUser = "select id, f_name, e_name, voice from user where id = (select user_id from email where email = '"+identifyingMail+"') and password = '" + pass + "'";
 		
-		User tmp;
+		User tmp = null;
 		
 		System.out.println(queryUser);
 
@@ -203,6 +203,8 @@ public class DatabaseConnector {
 			}
 			System.out.println("j");
 			
+			//returnerar User obj ifall det finns någon
+			return tmp;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -14,7 +14,7 @@ import java.util.Map;
 
 /**
  * Servern skapar en egen session till varje anvŠndare som kopplar pŒ sig. 
- * Från den session lŠggs anvŠndarnament och en User i en hashmap i denna klassen.
+ * FrŒn den session lŠggs anvŠndarnament och en User i en hashmap i denna klassen.
  * 
  * @author Ussi
  */
@@ -24,12 +24,10 @@ public class Server {
 	private ServerSocket socket;
 	private User user;
 	
-	
-	//Tanken är just nu att man har användarnamn som nyckel och hela objektet som värde.
-	//printMap iterear hela - finns längst ner.
+	//Tanken Šr just nu att man har anvŠndarnamn som nyckel och hela objektet som vŠrde.
+	//printMap iterear hela - finns lŠngst ner.
 	public static HashMap<String, User> userMap = new HashMap<String, User>();
 
-	
 	/**
 	 * Startar trŒden och sŠtter igŒng lyssnaren
 	 */
@@ -53,7 +51,7 @@ public class Server {
 	}
 
 	/**
-	 * Lyssnar på inkommande enheter som vill koppla upp sig och hanterar varje anslutning i en egen tråd/session..
+	 * Lyssnar på inkommande enheter som vill koppla upp sig och hanterar varje anslutning i en egen trŒd/session..
 	 *
 	 */
 	private class ConnectionListener implements Runnable {
@@ -80,12 +78,12 @@ public class Server {
 					
 //					Session conn = new Session(clientSocket);
 //					new Thread(conn).start();
-						//Läser av vad som skickas
+						//LŠser av vad som skickas
 						if ((inputLine = d.readLine()) != null) {
 							System.out.println("SERVER första som skickas = " + inputLine);
 							
 							/**
-							 * Om det servern får in är CONNECT ska den öppna en ny anslutning med en viss användare. 
+							 * Om det servern fŒr in Šr CONNECT ska den šppna en ny anslutning med en viss anvŠndare. 
 							 */
 							if(inputLine.equals(Protocol.CONNECT)){
 								System.out.println("SERVER CONNECT");
@@ -93,11 +91,11 @@ public class Server {
 								new Thread(conn2).start();
 							}
 							/**
-							 * Reconnect får även ett användarnamn och hittar den i hashmapen och skickar 
-							 * även USER objektet till den användaren med i den skapade session
+							 * Reconnect fŒr Šven ett anvŠndarnamn och hittar den i hashmapen och skickar 
+							 * Šven USER objektet till den anvŠndaren med i den skapade session
 							 */
 							else if(inputLine.equals(Protocol.RECONNECT)){
-								//Efter den har fått RECONNECT måste den få användarnamnet.
+								//Efter den har fŒtt RECONNECT mŒste den fŒ anvŠndarnamnet.
 								if ((inputLine = d.readLine()) != null) {
 									System.out.println("SERVER RECONNECT username = " + inputLine);
 									User user = userMap.get(inputLine);

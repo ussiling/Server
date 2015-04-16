@@ -1,6 +1,6 @@
 package com.server.aqordify;
 /**
- * Denna klassen är protokollet på hur vi sköter kommunikationen mellan Servern och Appen.
+ * Denna klassen är protokollet på hur vi skšter kommunikationen mellan Servern och Appen.
  * De olika strängarna representerar olika siffor. 
  * @author Ussi
  *
@@ -31,6 +31,8 @@ public class Protocol {
 	public final static String isGETPLAYLIST = "202";
 	
 	public final static String SEARCH = "3001";
+	
+	public final static String ERROR = "-1";
 
 
 }
