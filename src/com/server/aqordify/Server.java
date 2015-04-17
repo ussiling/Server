@@ -36,6 +36,7 @@ public class Server {
 		ConnectionListener listener = new ConnectionListener();
 		new Thread(listener).start();
 		new DatabaseConnector();
+		
 	}
 
 	/**

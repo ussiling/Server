@@ -16,9 +16,11 @@ public class Protocol {
 	public final static String isDISCONNECTED = "199";
 	
 	public final static String SIGNIN = "1005";
+	public final static String SIGNOUT = "1095";
 	public final static String REGISTER = "1010";
 	
 	public final static String isSIGNIN = "105";
+	public final static String isSIGNOUT = "195";
 	public final static String isREGISTER = "110";
     
     public final static String CONFIRM_SIGNIN = "1007";
