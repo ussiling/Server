@@ -1,7 +1,7 @@
 package com.server.aqordify;
 /**
- * Denna klassen ‰r protokollet pÂ hur vi sköter kommunikationen mellan Servern och Appen.
- * De olika str‰ngarna representerar olika siffor. 
+ * Denna klassen är protokollet på hur vi sköter kommunikationen mellan Servern och Appen.
+ * De olika strängarna representerar olika siffor. 
  * @author Ussi
  *
  */
