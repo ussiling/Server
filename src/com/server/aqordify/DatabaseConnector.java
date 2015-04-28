@@ -3,6 +3,7 @@ package com.server.aqordify;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.security.*;
 
 /**
  * Class that handles communication with the Database
@@ -39,7 +40,7 @@ public class DatabaseConnector {
 		//testgrejer
 //		String[] pnr = {"077-1122211","099-3366633"};
 //		String[] eml = {"as@2slkjdfshdf.sad","rt@pp.oo"};
-//		addUserToDatabase("krutov", "krutovic", "sdfsdf", "tenor2", pnr, eml);
+		addUserToDatabase("krutov", "krutovic", "sdfsdf", "tenor2", pnr, eml);
 //		try {
 //			createQuire(1, "Crazy Singers", "Sin city");
 //		} catch (SQLException e) {
@@ -80,7 +81,7 @@ public class DatabaseConnector {
 			String[] emailAdress) {
 		long key = -1L;
 		PreparedStatement ps;
-		String query = "insert into user (f_name, e_name, password, voice) values ('"+name+"', '"+surName+"', '"+password+"', '"+voice+"')";
+		String query = "insert into user (f_name, e_name, password, voice) values ('"+name+"', '"+surName+"', '"+encryptedPassword+"', '"+voice+"')";
 		
 		try {
 			ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -201,9 +202,7 @@ public class DatabaseConnector {
 					System.out.println(memberArr[0]);
 					}
 			}
-			System.out.println("j");
-			
-			//returnerar User obj ifall det finns någon
+			//Returns the user object if the login was successfull.
 			return tmp;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
