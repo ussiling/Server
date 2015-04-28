@@ -20,7 +20,7 @@ import java.net.Socket;
 
 
 /**
- * Session tar hand om allting varje anv‰ndare vill och kan gˆra. Hanterar inlogg, registrering och hantering av listorna.
+ * Session tar hand om allting varje användare vill och kan göra. Hanterar inlogg, registrering och hantering av listorna.
  * 
  * @author Ussi
  */
@@ -32,11 +32,12 @@ public class Session implements Runnable {
 	private PrintStream printstream; 
 	private BufferedReader buffer;
 	private User correctUser = null;
+	private DatabaseConnector dbc =  new DatabaseConnector();
 
 
 	public final int PORT = 24000;
 
-	private User user;
+	private User user ;
 
 
 	/**
@@ -60,7 +61,7 @@ public class Session implements Runnable {
 	}
 
 	/**
-	 * Reconnect ska veta vem anv‰ndaren ‰r d‰rav en till konstruktor med ett helt User objekt
+	 * Reconnect ska veta vem användaren är därav en till konstruktor med ett helt User objekt
 	 * @param clientSocket - kopplingen
 	 * @param user - anv‰ndarens objekt
 	 */
@@ -71,7 +72,7 @@ public class Session implements Runnable {
 			buffer = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			datainputstream = new DataInputStream(new BufferedInputStream(client.getInputStream()));	
 			printstream = new PrintStream(new BufferedOutputStream(client.getOutputStream(), 1024), false);
-			System.out.println("SESSION  trying to connect");
+			System.out.println("SESSION  trying to reconnect");
 
 		}catch(IOException e){
 			System.out.println(e.getMessage() + " getMessage");
@@ -112,11 +113,9 @@ public class Session implements Runnable {
 						user = userPass[1];
 						pass = userPass[2];
 						System.out.println("SESSION information" + " " + user + " " + pass); 	
-
-						
 						
 						//Returnar ett User objekt eller null
-						correctUser = new DatabaseConnector().checkLogin(user, pass); 
+						correctUser = dbc.checkLogin(user, pass); 
 						System.out.println("SESSION did u get it right? = " +correctUser); 	
 						if(correctUser!=null){
 
@@ -125,12 +124,12 @@ public class Session implements Runnable {
 						 * ett User objekt och sparar det i Servern och skickar det till Appen
 						 * 
 						 */
-						//User u = new User("ussi", "Usman", "Sheikh", "Malmˆ", "SE", false);
+
 						Server.userMap.put(user, correctUser);
-						
+						printstream.println(Protocol.isSIGNIN);
 						printstream.println(correctUser.getFirstName() + correctUser.getLastName() + correctUser.getEmail() + correctUser.getPhone() + correctUser.getVoice() + correctUser.getAdmin() + correctUser.getMember());
 						printstream.flush();
-						
+						getuserStartscreen();
 						}else{
 							
 						/**
@@ -144,6 +143,53 @@ public class Session implements Runnable {
 						//			    		  }
 					}
 				}
+				
+				
+				if(inputLine.startsWith(Protocol.RECONNECT)){
+					if ((inputLine = buffer.readLine()) != null) {
+						try{
+						User reconUser = Server.userMap.get(inputLine);
+						
+						if(reconUser!=null){
+							//Den är reconnected.
+							printstream.println(Protocol.isRECONNECTED);
+							getuserStartscreen();
+						}else{
+							//Gick inte att reconnect
+							printstream.println(Protocol.ERROR);
+						}
+						
+						}catch(NullPointerException e){
+							System.out.println("userMap returnerar null eller något");
+							printstream.println(Protocol.ERROR);
+						}
+						
+						
+					}
+				}
+				if(inputLine.startsWith(Protocol.SIGNOUT)){
+					if ((inputLine = buffer.readLine()) != null) {
+						try{
+						User signout = Server.userMap.remove(inputLine);
+						
+						if(signout!=null){
+							//Den är utloggad.
+							printstream.println(Protocol.isSIGNOUT);
+						}else{
+							//Gick inte att ta bort user/logga ut
+							printstream.println(Protocol.ERROR);
+						}
+						
+						}catch(NullPointerException e){
+							System.out.println("userMap returnerar null eller något");
+							printstream.println(Protocol.ERROR);
+						}
+						
+						
+					}
+				}
+				
+				
 				/**
 				 * Om användaren ska registrera får jag alla parametrar, skickar databasens svar (godkänd,anv busy, osv) 
 				 * tillbaka till applikationen.
@@ -156,23 +202,29 @@ public class Session implements Runnable {
 						/**
 						 * Se till att allting är ifylld
 						 */
+						String [] email = null;
 						String [] registerUser = registerInfo.split(",");
 						String firstName = registerUser[1];
 						String lastName = registerUser[2];
-						String email = registerUser[3];
+						email[0] = registerUser[3];
 						String password = registerUser[4];
 						String part = registerUser[5];						
 						
 						System.out.println(firstName + " " + lastName + " " + email + " " + password + " " + part);
-							//Skicka till databasen med en try sats. 
+							//Skicka till databasen med en try sats.
+				
+						if(dbc.addUserToDatabase(firstName, lastName, password, part, null, email)){
 							printstream.println(Protocol.isREGISTER);
 							printstream.flush();		
 							getuserStartscreen();
+						}
 //					}
 				}
 
 				if(inputLine.startsWith(Protocol.SEARCH)){
 					String search = inputLine;
+					
+					
 					//Skicka det till servern och vänta på svar som du sen skickar vidare till appen med
 					//printstream.println(Protocol.isREGISTER);
 					//printstream.flush();	
@@ -207,22 +259,22 @@ public class Session implements Runnable {
 	private void getuserStartscreen() {
 		
 		//Hämta och skicka en lista på vilka konserer användaren är med i för att visa upp det i
-		//printstream.println(Protocol.isREGISTER);
+		//printstream.println(Protocol.);
 		//printstream.flush();
 		
 	}
 	
 
-	/**
-	 * Om nu appen har kopplat ifrån så kopplar den på igen genom att titta om användaren finns med i listan som inloggad. 
-	 */
-	public void reconnectUser(String username){
-				System.out.println("SESSION  RECONNECT = " + username);
-	
-				User u = Server.userMap.get(username);
-				System.out.println(u.getFirstName() + " " + u.getLastName());
-
-	}
+//	/**
+//	 * Om nu appen har kopplat ifrån så kopplar den på igen genom att titta om användaren finns med i listan som inloggad. 
+//	 */
+//	public void reconnectUser(String username){
+//				System.out.println("SESSION  RECONNECT = " + username);
+//	
+//				User u = Server.userMap.get(username);
+//				System.out.println(u.getFirstName() + " " + u.getLastName());
+//
+//	}
 	
 /**
  * 

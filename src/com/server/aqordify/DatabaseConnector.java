@@ -77,7 +77,7 @@ public class DatabaseConnector {
 	/**
 	 * Method that adds a new user to the database
 	 */
-	public void addUserToDatabase(String name, String surName, String password, String voice, String[] phoneNumber,
+	public boolean addUserToDatabase(String name, String surName, String password, String voice, String[] phoneNumber,
 			String[] emailAdress) {
 		long key = -1L;
 		PreparedStatement ps;
@@ -108,7 +108,9 @@ public class DatabaseConnector {
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+			return false;
 		}
+		return true;
 				
 	}
 
